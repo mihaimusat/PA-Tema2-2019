@@ -1,0 +1,78 @@
+Musat Mihai-Robert
+Grupa 323 CB
+
+======================================================Tema 2 - Grafuri======================================================
+
+Problema 1
+----------
+
+Pentru rezolvarea acestei probleme, am facut mai intai observatia ca graful pe care trebuie sa il construiesc este de fapt un 
+arbore cu radacina in nodul 1, iar distantele reprezinta nivelul nodului in arbore.Astfel, pe masura ce citesc un element din 
+vectorul de distante, il bag intr-o matrice mat, in care retin in mat[i][j] = distanta de la nodul de pe nivelul i la nodul de
+pe nivelul j.Dupa ce am facut aceasta operatie, vreau sa construiesc graful in felul urmator: iau toate nodurile aflate la 
+distanta 1 si le leg de nodul 1, iau toate nodurile aflate la distanta 2 si le unesc de un nod oarecare aflat la distanta 1 si 
+asa mai departe.Astfel, mai intai verific daca distanta de la nodul de pe nivelul 0 (dupa cum am spus, graful pe care il construiesc 
+este in fapt ca un arbore in care nodul 1 este radacina) la un nod de pe nivelul urmator este sau nu egala cu 1, deoarece trebuie sa 
+iau mai intai nodurile aflate la distanta 1 de nodul 1. Apoi, continui acest procedeu pentru toate nodurile care se afla la distanta 
+cel putin 1 in vectorul de distante si am doua cazuri: fie vectorul de distante de la nodul de pe nivelul i la celelalte noduri este 
+gol, fie vectorul de distante are elemente si incerc sa leg fiecare nod aflat la distanta dist de cel putin un nod care se afla la 
+distanta (dist - 1).Daca pentru un nod aflat la distanta dist nu exista un nod aflat la distanta (dist - 1), atunci inseamna ca nu 
+pot sa construiesc graful si afisez -1, iar in caz contrar afisez numarul de muchii si capetele muchiilor.
+
+Complexitatea (worst-case) a algoritmului implementat de mine este, dupa cum urmeaza: 
+-complexitate temporala: citire date de intrare = O(n)				  |
+			 construire graf cu constrangerile de mai sus = O(n + m)  | => total: O(n + m)
+			 afisare output = O(m) (daca pot construi graful)	  |			     
+-complexitate spatiala: O(n^2) deoarece costul alocarii matricii mat este mai mare 
+			decat O(n) (costul alocarii vectorului de perechi edges)
+		
+Problema 2
+----------
+
+Pentru a implementa solutia acestei probleme, am folosit un algoritm destul de cunoscut, si anume algoritmul Fill.Din punct de vedere
+conceptual seamana cu o parcurgere DFS, doar ca aici nu caut neaparat primul vecin nevizitat al nodului curent, ci pentru fiecare 
+patratica de o anumita valoare val, trec prin toate patratelele care au valoarea intre val si val + k.Astfel, pentru o celula oarecare 
+din matrice verific sa nu fie prima/ultima linie/coloana, sa nu fie vizitata si valoarea de la celula respectiva sa se afle in intervalul [val, val + k], comportament descris de functia check.Daca toate aceste conditii sunt indeplinite, atunci inseamna ca pot sa consider 
+fiecare celula (x, y) din matrice ca un nod din care pot sa pornesc fill-ul, aplicat pe cei 4 vecini ai sai: (x - 1, y), (x, y - 1),
+(x + 1, y), (x, y + 1).Pentru determinarea ariei maxime de celule conectate cu proprietatea din enunt, consider fiecare celula din matrice 
+ca un posibil candidat in pornirea algoritmului fill, astfel ca retin numarul de celule conectate si valoarea din matrice de la pasul
+curent.Daca dupa aplicarea algoritmului, am gasit un numar de casute mai mare care respecta faptul ca diferenta dintre valoarea maxima
+si valoarea minima din acea zona este cel mult k, updatez aria maxima.De asemenea, pentru a reduce complexitatea algoritmului, la final
+iau fiecare celula care face parte din lantul de celule conectate la pasul curent, si o marchez ca fiind vizitata pentru a nu incepe
+rularea algoritmului fill pornind de la una din aceste casute.Astfel, se garanteaza ca toate drumurile gasite au elemente unice, vizitate
+o singura data, si ca aria maxima gasita este optima.
+
+Complexitatea (worst-case) a algoritmului implementat de mine este, dupa cum urmeaza:
+-complexitate temporala: citire date de intrare = O(n * m)		|
+			 initializare matrice viz[][] = O(n * m)	|
+			 aflare arie maxima ceruta = O(n^2 * m^2)	| => total: O(n^2 * m^2)
+			 afisare output = O(1)				|
+-complexitate spatiala: O(n^2) deoarece retin matricea initiala, o matrice de celule vizitate, 
+			si doi vectori de pozitie vertical si orizontal cu ~n^2 elemente
+
+Problema 3
+----------
+
+Pentru rezolvarea acestei probleme, m-am gandit sa folosesc o versiune modificata a algoritmului Dijkstra, cu mentiunea ca daca in 
+algoritmul original, tineam in d[i] = distanta minima pana la nodul i, pentru aceasta problema mi-am dat seama ca este important doar
+tipul ultimei muchii.Astfel, am retinut o matrice d[i][j] = distanta minima pana la nodul i, daca ultima muchie este de tipul j, iar in
+priority_queue am retinut in ordine: distanta pe care am introdus-o mai sus, nodul curent la care am ajuns si tipul ultimei muchii.
+Dupa ce fac citirea datelor de intrare, am grija sa modific matricea de penalizari astfel incat prima muchie are costul suplimentar 0 
+deoarece am pornit din nodul 1 cu prima muchie de tip 0, si sa initializez matricea de distante cu inf.Initial, distanta pana la nodul 1,
+daca ultima muchie este de tip 0, este 0, in priority_queue, am distanta initiala  0, nodul curent 1 si tipul ultimei muchii 0, iar costul
+minim este inf.Cat timp mai am elemente in pq, extrag distanta curenta, nodul curent si tipul ultimei muchii.Daca am ajuns la ultimul nod,
+atunci inseamna ca am gasit costul minim, acesta fiind egal cu distanta curenta.Daca nodul aflat in curs de procesare nu este nodul
+destinatie, adica nodul n, atunci parcurg lista de vecini a nodului curent si calculez distanta minima de la nodul curent la fiecare 
+dintre acesti vecini cu penalizarea corespunzatoare.Daca am gasit o distanta mai mica decat distanta curenta, atunci updatez in pq 
+distanta curenta, nodul la care am ajuns si tipul ultimei muchii.La final, daca am gasit un drum de cost minim de la nodul 1 la nodul n, 
+cu constrangerile impuse de penalizarile muchiilor, atunci afisez costul minim, iar in caz contrar afisez -1.
+
+Complexitatea (worst-case) a algoritmului implementat de mine este, dupa cum urmeaza:
+-complexitate temporala: citire date de intrare = O(m) + O(t^2) = O(t^2) |
+			 aflare cost minim = O(n^2 + m) 		 | => total: O(n^2 + m)
+			 afisare output = O(1)				 |
+
+-complexitate spatiala: O(n^2) deoarece costul alocarii celor doua matrice penal si dist 
+			este mai mare decat costul alocarii pq sau adj
+
+
